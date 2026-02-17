@@ -8,5 +8,4 @@ coverage
 .vscode
 credentials.json
 auth_url.txt
-credentials.json
-auth_url.txt
+client_secret*.json
