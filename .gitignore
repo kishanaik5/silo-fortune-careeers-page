@@ -5,3 +5,8 @@ dist
 build
 coverage
 *.log
+.vscode
+credentials.json
+auth_url.txt
+credentials.json
+auth_url.txt
