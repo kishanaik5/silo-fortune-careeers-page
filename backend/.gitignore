@@ -1,0 +1,33 @@
+﻿# Dependencies
+node_modules/
+
+# Environment variables
+.env
+
+# Google API secrets
+credentials.json
+client_secret*.json
+token.json
+
+# OAuth and debug files
+auth_url.txt
+auth_url_v2.txt
+
+# Quota output files
+quota_info.txt
+quota_result.txt
+
+# Logs
+*.log
+sheets_error.log
+upload_error.log
+
+# Temporary file uploads
+uploads/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/
