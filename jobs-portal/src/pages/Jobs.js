@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Briefcase, MapPin, ArrowRight, Search, Filter, Clock } from 'lucide-react';
+import { useCandidateAuth } from '../context/CandidateAuthContext';
 
 const Jobs = () => {
     const [jobs, setJobs] = useState([]);
@@ -12,6 +13,8 @@ const Jobs = () => {
         category: 'All'
     });
     const navigate = useNavigate();
+    const location = useLocation();
+    const { user } = useCandidateAuth();
 
     useEffect(() => {
         const debounce = setTimeout(() => {

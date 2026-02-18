@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LogOut, Briefcase, FileText, CheckCircle, XCircle, Clock, Users, ArrowRight, TrendingUp, Ticket, Calendar } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import TopLogo from '../assets/silo-logo.png';
 
 const AdminDashboard = () => {
     const { isAuthenticated, logout, isLoading, admin } = useAuth();
@@ -41,7 +42,8 @@ const AdminDashboard = () => {
             color: "blue",
             bg: "bg-blue-50",
             text: "text-blue-600",
-            border: "border-blue-200"
+            border: "border-blue-200",
+            link: "/admin-job-roles"
         },
         {
             label: "Pending Review",
@@ -79,8 +81,8 @@ const AdminDashboard = () => {
                 <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
                 <div className="container mx-auto flex justify-between items-center relative z-10">
                     <div className="flex items-center gap-4">
-                        <div className="bg-white/10 p-2.5 rounded-xl border border-white/10 backdrop-blur-sm">
-                            <span className="font-bold tracking-widest text-sm">SILO</span>
+                        <div className="bg-white p-2 rounded-xl shadow-sm">
+                            <img src={TopLogo} alt="Silo Fortune" className="h-8 w-auto object-contain" />
                         </div>
                         <h1 className="text-2xl font-bold tracking-tight">Admin Portal</h1>
                     </div>
@@ -114,7 +116,11 @@ const AdminDashboard = () => {
                 {/* Stats Row */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
                     {stats.map((stat, index) => (
-                        <div key={index} className={`bg-white p-6 rounded-2xl shadow-sm border ${stat.border} hover:shadow-md transition-shadow`}>
+                        <div
+                            key={index}
+                            onClick={() => stat.link && navigate(stat.link)}
+                            className={`bg-white p-6 rounded-2xl shadow-sm border ${stat.border} hover:shadow-md transition-shadow ${stat.link ? 'cursor-pointer hover:scale-[1.02] transition-transform duration-200' : ''}`}
+                        >
                             <div className="flex items-center justify-between mb-4">
                                 <div className={`p-3 rounded-xl ${stat.bg} ${stat.text}`}>
                                     {stat.icon}

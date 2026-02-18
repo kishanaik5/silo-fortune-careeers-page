@@ -32,11 +32,11 @@ function App() {
         <Navbar />
         <Routes>
           <Route path="/login" element={<CandidateLogin />} />
-          <Route path="/" element={<RequireAuth><Home /></RequireAuth>} />
-          <Route path="/jobs" element={<RequireAuth><Jobs /></RequireAuth>} />
-          <Route path="/events" element={<RequireAuth><Events /></RequireAuth>} />
-          <Route path="/events/all" element={<RequireAuth><AllEvents /></RequireAuth>} />
-          <Route path="/stories/all" element={<RequireAuth><AllStories /></RequireAuth>} />
+          <Route path="/" element={<Home />} />
+          <Route path="/jobs" element={<Jobs />} />
+          <Route path="/events" element={<Events />} />
+          <Route path="/events/all" element={<AllEvents />} />
+          <Route path="/stories/all" element={<AllStories />} />
           <Route path="/:title/:department/:type" element={<ApplyJob />} />
         </Routes>
       </Router>

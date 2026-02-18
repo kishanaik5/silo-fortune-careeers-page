@@ -7,7 +7,16 @@ const ManageJobs = () => {
     const { isAuthenticated, isLoading } = useAuth();
     const navigate = useNavigate();
     const [jobs, setJobs] = useState([]);
-    const [newJob, setNewJob] = useState({ title: '', location: '', type: 'Full-time', department: '', description: '', requirements: '', experience: '', category: 'Developers' });
+    const [newJob, setNewJob] = useState({
+        title: '',
+        location: '',
+        type: 'Full-time',
+        department: '',
+        description: `Posted Date: ${new Date().toLocaleDateString()}\nJob ID: SILO-${Math.floor(1000 + Math.random() * 9000)}`,
+        requirements: '',
+        experience: '',
+        category: 'Developers'
+    });
     const [isEditing, setIsEditing] = useState(false);
     const [editJobId, setEditJobId] = useState(null);
 
@@ -44,7 +53,16 @@ const ManageJobs = () => {
 
             if (response.ok) {
                 fetchJobs();
-                setNewJob({ title: '', location: '', type: 'Full-time', department: '', description: '', requirements: '', experience: '', category: 'Developers' });
+                setNewJob({
+                    title: '',
+                    location: '',
+                    type: 'Full-time',
+                    department: '',
+                    description: `Posted Date: ${new Date().toLocaleDateString()}\nJob ID: SILO-${Math.floor(1000 + Math.random() * 9000)}`,
+                    requirements: '',
+                    experience: '',
+                    category: 'Developers'
+                });
                 setIsEditing(false);
                 setEditJobId(null);
                 alert(isEditing ? "Job updated successfully!" : "Job added successfully!");
@@ -74,7 +92,16 @@ const ManageJobs = () => {
     const handleCancelEdit = () => {
         setIsEditing(false);
         setEditJobId(null);
-        setNewJob({ title: '', location: '', type: 'Full-time', department: '', description: '', requirements: '', experience: '', category: 'Developers' });
+        setNewJob({
+            title: '',
+            location: '',
+            type: 'Full-time',
+            department: '',
+            description: `Posted Date: ${new Date().toLocaleDateString()}\nJob ID: SILO-${Math.floor(1000 + Math.random() * 9000)}`,
+            requirements: '',
+            experience: '',
+            category: 'Developers'
+        });
     };
 
     const handleDeleteJob = async (id) => {

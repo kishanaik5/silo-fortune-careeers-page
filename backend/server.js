@@ -146,15 +146,12 @@ app.get('/api/jobs', async (req, res) => {
         const conditions = [];
 
         if (search) {
-            // Normalize search query: remove non-alphanumeric characters and lowercase
-            const normalizedSearch = search.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-            queryParams.push(normalizedSearch);
+            // Remove spaces from the search query for tolerance
+            const normalizedSearch = search.replace(/\s+/g, '');
+            queryParams.push(`%${normalizedSearch}%`);
 
-            // Normalize database columns during comparison to ensure case-insensitive matching
             conditions.push(`(
-                LOWER(REGEXP_REPLACE(title, '[^a-zA-Z0-9]', '', 'g')) LIKE '%' || $${queryParams.length} || '%' OR 
-                LOWER(REGEXP_REPLACE(description, '[^a-zA-Z0-9]', '', 'g')) LIKE '%' || $${queryParams.length} || '%' OR 
-                LOWER(REGEXP_REPLACE(department, '[^a-zA-Z0-9]', '', 'g')) LIKE '%' || $${queryParams.length} || '%'
+                REPLACE(title, ' ', '') ILIKE $${queryParams.length}
             )`);
         }
 
@@ -287,9 +284,10 @@ app.post('/api/apply', applicationUpload, async (req, res) => {
     }
 
     // Cover Letter is now a file, mandatory
-    if (!coverLetterFile) {
-        return res.status(400).json({ error: 'Cover Letter file is required' });
-    }
+    // Cover Letter is optional now
+    // if (!coverLetterFile) {
+    //     return res.status(400).json({ error: 'Cover Letter file is required' });
+    // }
 
     const requiredFields = [
         'jobId', 'first_name', 'last_name', 'email', 'phone', 'location', 'pincode', // Added pincode
@@ -482,6 +480,40 @@ app.get('/api/events', async (req, res) => {
     } catch (err) {
         console.error('Error fetching events:', err);
         res.status(500).json({ error: 'Server error fetching events' });
+    }
+});
+
+// Update Event
+app.put('/api/events/:id', async (req, res) => {
+    const { id } = req.params;
+    const { title, date, location, total_tickets, price, description, status } = req.body;
+    try {
+        const result = await pool.query(
+            'UPDATE events SET title=$1, date=$2, location=$3, total_tickets=$4, price=$5, description=$6, status=COALESCE($7, status) WHERE id=$8 RETURNING *',
+            [title, date, location, total_tickets, price, description, status, id]
+        );
+        if (result.rows.length === 0) return res.status(404).json({ error: 'Event not found' });
+        res.json(result.rows[0]);
+    } catch (err) {
+        console.error('Error updating event:', err);
+        res.status(500).json({ error: 'Server error updating event' });
+    }
+});
+
+// Delete Event
+app.delete('/api/events/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        // First delete related registrations
+        await pool.query('DELETE FROM event_registrations WHERE event_id = $1', [id]);
+        // Then delete the event
+        const result = await pool.query('DELETE FROM events WHERE id = $1 RETURNING *', [id]);
+
+        if (result.rows.length === 0) return res.status(404).json({ error: 'Event not found' });
+        res.json({ message: 'Event deleted successfully' });
+    } catch (err) {
+        console.error('Error deleting event:', err);
+        res.status(500).json({ error: 'Server error deleting event' });
     }
 });
 

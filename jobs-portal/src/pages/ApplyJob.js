@@ -362,7 +362,7 @@ const ApplyJob = () => {
                                         const data = await response.json();
 
                                         if (data.exists) {
-                                            showNotification('You have already applied for this position.', 'error');
+                                            showNotification('You have already applied for this position.', 'info');
                                         } else {
                                             setEmail(user.email);
                                             setIsVerified(true);
@@ -621,13 +621,13 @@ const ApplyJob = () => {
                                     </div>
                                     <div className="mt-4">
                                         <label className="block text-sm font-semibold text-gray-700 mb-1">GitHub Projects</label>
-                                        <textarea name="projects_github" rows="2" value={formData.projects_github} onChange={handleFormChange} className={`w-full p-3 border rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none resize-none ${formData.projects_github && !GITHUB_REGEX.test(formData.projects_github) ? 'border-red-500 bg-red-50' : ''}`} placeholder="Links to your best projects"></textarea>
+                                        <textarea name="projects_github" rows="2" value={formData.projects_github} onChange={handleFormChange} className={`w-full p-3 border rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none resize-none ${formData.projects_github && !GITHUB_REGEX.test(formData.projects_github) ? 'border-red-500 bg-red-50' : ''}`} placeholder="https://github.com/your-username"></textarea>
                                         {formData.projects_github && !GITHUB_REGEX.test(formData.projects_github) && <p className="text-red-500 text-xs mt-1">Invalid GitHub URL format</p>}
                                     </div>
                                     <div className="mt-4">
-                                        <label className="block text-sm font-semibold text-gray-700 mb-1">Cover Letter (PDF) <span className="text-red-500">*</span></label>
+                                        <label className="block text-sm font-semibold text-gray-700 mb-1">Cover Letter (PDF)</label>
                                         {/* Changed to File Upload */}
-                                        <input required type="file" accept=".pdf" name="cover_letter" onChange={handleFormChange} className="w-full p-3 border border-gray-200 rounded-xl" />
+                                        <input type="file" accept=".pdf" name="cover_letter" onChange={handleFormChange} className="w-full p-3 border border-gray-200 rounded-xl" />
                                     </div>
                                 </div>
                             )}

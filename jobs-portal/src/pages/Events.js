@@ -177,7 +177,7 @@ const Events = () => {
                     </div>
 
                     <div className="grid md:grid-cols-2 gap-10">
-                        {events.map(event => (
+                        {events.slice(0, 2).map(event => (
                             <div key={event.id} className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 group border border-gray-100 flex flex-col h-full">
                                 <div className="h-64 overflow-hidden relative">
                                     <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-gray-800 z-10 uppercase tracking-wider shadow-sm">
@@ -194,7 +194,7 @@ const Events = () => {
                                     <div className="flex items-center gap-6 text-emerald-600 text-sm font-semibold mb-4">
                                         <span className="flex items-center gap-2 bg-emerald-50 px-3 py-1 rounded-full"><Calendar size={16} /> {event.date}</span>
                                         <span className="flex items-center gap-2 text-gray-500"><MapPin size={16} /> {event.location}</span>
-                                        <span className="flex items-center gap-2 text-emerald-700 font-bold">₹{event.price > 0 ? event.price : 'Free'}</span>
+                                        <span className="flex items-center gap-2 text-emerald-700 font-bold">{event.price > 0 ? `₹${event.price}` : 'Free'}</span>
                                     </div>
                                     <div className="flex justify-between items-center mb-4">
                                         <h3 className="text-2xl font-bold text-gray-900 group-hover:text-emerald-700 transition-colors">{event.title}</h3>

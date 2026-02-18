@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Calendar, MapPin, ArrowLeft, Search, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import AgriSummit from '../assets/agri-summit.png';
@@ -17,62 +17,31 @@ const AllEvents = () => {
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
 
-    const events = [
-        {
-            id: 1,
-            title: "Silo Fortune Hackathon 2026",
-            date: "March 15, 2026",
-            location: "Bangalore, India",
-            category: "Hackathon",
-            description: "Join us for a 24-hour hackathon focused on solving challenges in sustainable agriculture using AI and IoT.",
-            image: HackathonImage
-        },
-        {
-            id: 2,
-            title: "Agri-Tech Summit",
-            date: "April 22, 2026",
-            location: "Virtual",
-            category: "Conference",
-            description: "A global summit discussing the future of farming and technology. Featuring speakers from top agritech companies.",
-            image: AgriSummit
-        },
-        {
-            id: 3,
-            title: "Sustainable Farming Workshop",
-            date: "May 10, 2026",
-            location: "Pune, India",
-            category: "Workshop",
-            description: "Hands-on workshop on organic farming techniques and soil health management.",
-            image: "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?q=80&w=2070&auto=format&fit=crop"
-        },
-        {
-            id: 4,
-            title: "Future of Food Security Panel",
-            date: "June 05, 2026",
-            location: "Delhi, India",
-            category: "Panel Discussion",
-            description: "Experts discuss the challenges and solutions for global food security in the coming decades.",
-            image: "https://images.unsplash.com/photo-1544531586-fde5298cdd40?q=80&w=2070&auto=format&fit=crop"
-        },
-        {
-            id: 5,
-            title: "Rural Innovation Fair",
-            date: "July 20, 2026",
-            location: "Hyderabad, India",
-            category: "Exhibition",
-            description: "Showcasing grassroots innovations from rural farmers and entrepreneurs.",
-            image: "https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?q=80&w=2070&auto=format&fit=crop"
-        },
-        {
-            id: 6,
-            title: "AI in Agriculture Webinar",
-            date: "August 12, 2026",
-            location: "Virtual",
-            category: "Webinar",
-            description: "Deep dive into how Artificial Intelligence is transforming crop monitoring and yield prediction.",
-            image: "https://images.unsplash.com/photo-1550989460-0adf9ea622e2?q=80&w=1974&auto=format&fit=crop"
-        }
-    ];
+    const [events, setEvents] = useState([]);
+
+    useEffect(() => {
+        const fetchEvents = async () => {
+            try {
+                const response = await fetch('http://localhost:5000/api/events');
+                if (response.ok) {
+                    const data = await response.json();
+                    // Process events to add images (randomly or placeholder since DB doesn't have images)
+                    const processedEvents = data.map(event => ({
+                        ...event,
+                        // Assign random image from imports or placeholder
+                        image: event.title.toLowerCase().includes('hackathon') ? HackathonImage :
+                            event.title.toLowerCase().includes('summit') ? AgriSummit :
+                                'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&q=80&w=2069',
+                        category: event.title.includes('Hackathon') ? 'Hackathon' : 'Event'
+                    }));
+                    setEvents(processedEvents);
+                }
+            } catch (error) {
+                console.error('Error fetching events:', error);
+            }
+        };
+        fetchEvents();
+    }, []);
 
     const handleRegister = (event) => {
         setSelectedEvent(event);
@@ -162,6 +131,7 @@ const AllEvents = () => {
                             <div className="p-6 flex-grow flex flex-col">
                                 <div className="flex items-center gap-4 text-emerald-600 text-xs font-bold mb-3">
                                     <span className="flex items-center gap-1 uppercase tracking-wide"><Calendar size={14} /> {event.date}</span>
+                                    <span className="flex items-center gap-1 uppercase tracking-wide ml-auto text-emerald-700">{event.price > 0 ? `₹${event.price}` : 'Free'}</span>
                                 </div>
                                 <h3 className="text-xl font-bold text-gray-900 mb-2">{event.title}</h3>
                                 <div className="flex items-center gap-1 text-gray-500 text-sm mb-4">

@@ -114,6 +114,7 @@ const createTables = async () => {
             );
 
             ALTER TABLE events ADD COLUMN IF NOT EXISTS price INTEGER DEFAULT 0;
+            ALTER TABLE events ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'Upcoming';
         `;
         await pool.query(alterQuery);
 

@@ -80,9 +80,9 @@ const Navbar = () => {
                     ) : (
                         <Link
                             to="/login"
-                            className={`font-medium transition ${isActive('/login') ? 'text-emerald-600' : 'text-gray-600 hover:text-emerald-600'}`}
+                            className="px-6 py-2 bg-emerald-600 text-white rounded-full font-bold hover:bg-emerald-700 transition shadow-md"
                         >
-                            Login
+                            Enroll
                         </Link>
                     )}
 
@@ -146,9 +146,9 @@ const Navbar = () => {
                             <Link
                                 to="/login"
                                 onClick={() => setIsOpen(false)}
-                                className={`font-medium text-lg ${isActive('/login') ? 'text-emerald-600' : 'text-gray-600'}`}
+                                className="px-6 py-2 bg-emerald-600 text-white rounded-full font-bold hover:bg-emerald-700 transition shadow-md text-center"
                             >
-                                Login
+                                Enroll
                             </Link>
                         )}
                     </div>
