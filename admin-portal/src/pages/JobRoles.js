@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, Download, Users, Check, X, FileText } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import ConfirmModal from '../components/ConfirmModal';
+import Toast from '../components/Toast';
 
 const JobRoles = () => {
     const { isAuthenticated, isLoading } = useAuth();
@@ -10,6 +12,11 @@ const JobRoles = () => {
     const [applications, setApplications] = useState([]);
     const [roles, setRoles] = useState([]);
     const [selectedRole, setSelectedRole] = useState(null);
+    const [confirm, setConfirm] = useState({ open: false, id: null, status: '' });
+    const [toast, setToast] = useState({ open: false, message: '', type: 'success' });
+
+    const showToast = (message, type = 'success') => setToast({ open: true, message, type });
+    const closeToast = () => setToast(t => ({ ...t, open: false }));
 
     useEffect(() => {
         if (!isLoading && !isAuthenticated) {
@@ -41,24 +48,27 @@ const JobRoles = () => {
     };
 
     const handleStatusUpdate = async (id, status) => {
-        if (!window.confirm(`Are you sure you want to ${status.toLowerCase()} this applicant?`)) return;
+        setConfirm({ open: true, id, status });
+    };
 
+    const doStatusUpdate = async () => {
+        const { id, status } = confirm;
+        setConfirm({ open: false, id: null, status: '' });
         try {
             const response = await fetch(`http://localhost:5000/api/applications/${id}/status`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status })
             });
-
             if (response.ok) {
-                alert(`Applicant ${status.toLowerCase()} successfully!`);
-                fetchApplications(); // Refresh data
+                showToast(`Applicant ${status.toLowerCase()} successfully!`, 'success');
+                fetchApplications();
             } else {
-                alert('Failed to update status.');
+                showToast('Failed to update status.', 'error');
             }
         } catch (error) {
             console.error('Error updating status:', error);
-            alert('Error updating status.');
+            showToast('Error updating status.', 'error');
         }
     };
 
@@ -103,7 +113,7 @@ const JobRoles = () => {
         : [];
 
     return (
-        <div className="min-h-screen bg-gray-50 p-8">
+        <>
             <div className="max-w-6xl mx-auto">
                 <button
                     onClick={() => selectedRole ? setSelectedRole(null) : navigate('/admin-dashboard')}
@@ -241,7 +251,18 @@ const JobRoles = () => {
                     </div>
                 )}
             </div>
-        </div>
+
+            <ConfirmModal
+                isOpen={confirm.open}
+                title={`${confirm.status} Applicant`}
+                message={`Are you sure you want to ${confirm.status?.toLowerCase()} this applicant?`}
+                confirmText={confirm.status}
+                type={confirm.status === 'Shortlisted' ? 'info' : 'danger'}
+                onConfirm={doStatusUpdate}
+                onCancel={() => setConfirm({ open: false, id: null, status: '' })}
+            />
+            <Toast isOpen={toast.open} message={toast.message} type={toast.type} onClose={closeToast} />
+        </>
     );
 };
 

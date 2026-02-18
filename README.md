@@ -145,7 +145,7 @@ View all applicants grouped by job role.
 **Features:**
 - Roles displayed as cards showing applicant count.
 - Click a role card to drill into a table of all applicants for that role.
-- **Shortlist** (✓) or **Reject** (✗) candidates — triggers an automated status-update email.
+- **Shortlist** (✓) or **Reject** (✗) candidates — triggers a custom confirmation modal, then sends an automated status-update email on confirm.
 - **Download CSV** per role with all applicant details.
 - **Auto-select from Dashboard**: When navigated from the Pending Review or Shortlisted pages via the "View →" button, the relevant role is automatically pre-selected and expanded.
 
@@ -162,6 +162,7 @@ Dedicated page showing only `Pending` status applications.
 - Applications grouped by job role with expandable accordion rows.
 - Each row shows: **Name**, **Contact** (email + phone), **Applied On**.
 - **"View →"** button navigates to `/admin-job-roles` with that role pre-selected.
+- Status updates show a **Toast notification** (success/error) instead of a browser alert.
 
 **Implementation:** Fetches `/api/applications`, filters `status === 'Pending'`, groups by `job_title` using `Array.reduce`. Navigation passes `{ state: { role: app.job_title } }` to Job Roles page.
 
@@ -199,7 +200,8 @@ View all candidates marked as **Selected** after evaluation.
 
 **Features:**
 - Displays candidate name, role, contact details.
-- **Open Gmail** button pre-fills a Gmail compose window with the candidate's email for sending offer letters.
+- **Send Offer Email** button opens a compose modal to send an offer email directly via the backend (Gmail/SMTP).
+- Confirmation and error feedback shown via **Toast notification**.
 
 ---
 
@@ -219,8 +221,9 @@ Create and manage events shown on the Jobs Portal.
 
 **Features:**
 - Add new events with: Title, Description, Date, Location, Ticket Limit, Price.
-- Edit or delete existing events.
+- Edit or delete existing events — delete and "Mark Done" actions use a **custom confirmation modal** instead of a browser dialog.
 - Price `0` is displayed as **"Free"** on the portal.
+- Success/error feedback shown via **Toast notification**.
 
 ---
 
@@ -231,7 +234,8 @@ Create and manage job listings shown on the Jobs Portal.
 **Features:**
 - Add new job roles with title, department, type, experience, salary, description.
 - **Auto-fill**: Posted Date and Job ID are automatically inserted into the description field.
-- Edit or delete existing job listings.
+- Edit or delete existing job listings — delete uses a **custom confirmation modal**.
+- Success/error feedback shown via **Toast notification**.
 
 ---
 
@@ -359,6 +363,12 @@ Browse all published success stories and news articles.
 ---
 
 ## 📋 Changelog
+
+### v6.0 — Custom Modals & Toast Notifications
+- **ConfirmModal Component**: All `window.confirm()` browser dialogs replaced with a custom styled `ConfirmModal` component (supports `warning`, `info`, `danger` types with animated backdrop).
+- **Toast Component**: All `alert()` browser dialogs replaced with a slide-in `Toast` notification component with auto-close progress bar (supports `success`, `error`, `info` types).
+- **Pages Updated**: `JobRoles`, `Evaluation`, `ManageJobs`, `ManageEvents`, `SelectedCandidates`, `PendingReview` — all now use the new components for consistent, non-blocking UI feedback.
+- **CSS Animations**: Added `fadeIn`, `slideIn`, and `shrink` keyframe animations to `index.css` to power the new components.
 
 ### v5.0 — Dashboard Drill-Down & Validation
 - **Pending Review Page**: New `/admin-pending-review` page — clicking the "Pending Review" dashboard card shows all pending applicants grouped by job role with a "View →" link to Job Roles.

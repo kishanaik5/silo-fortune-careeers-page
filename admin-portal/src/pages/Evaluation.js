@@ -2,12 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Save, CheckCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import ConfirmModal from '../components/ConfirmModal';
+import Toast from '../components/Toast';
 
 const Evaluation = () => {
     const { isAuthenticated, isLoading } = useAuth();
     const navigate = useNavigate();
     const [applications, setApplications] = useState([]);
     const [editingId, setEditingId] = useState(null);
+    const [confirm, setConfirm] = useState({ open: false, id: null, status: '' });
+    const [toast, setToast] = useState({ open: false, message: '', type: 'success' });
+
+    const showToast = (message, type = 'success') => setToast({ open: true, message, type });
+    const closeToast = () => setToast(t => ({ ...t, open: false }));
 
     useEffect(() => {
         if (!isLoading && !isAuthenticated) {
@@ -47,24 +54,26 @@ const Evaluation = () => {
                 })
             });
             setEditingId(null);
-            alert('Details saved successfully!');
+            showToast('Details saved successfully!', 'success');
         } catch (error) {
             console.error('Error saving changes:', error);
         }
     };
 
     const updateStatus = async (id, newStatus) => {
-        if (!window.confirm(`Are you sure you want to mark this candidate as ${newStatus}?`)) return;
+        setConfirm({ open: true, id, status: newStatus });
+    };
 
+    const doUpdateStatus = async () => {
+        const { id, status: newStatus } = confirm;
+        setConfirm({ open: false, id: null, status: '' });
         try {
             const response = await fetch(`http://localhost:5000/api/applications/${id}/status`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status: newStatus })
             });
-
             if (response.ok) {
-                // If status changed to Selected or Rejected, remove from this list
                 setApplications(apps => apps.filter(app => app.id !== id));
             }
         } catch (error) {
@@ -75,7 +84,7 @@ const Evaluation = () => {
     if (isLoading) return <div>Loading...</div>;
 
     return (
-        <div className="min-h-screen bg-gray-50 p-8">
+        <>
             <div className="max-w-7xl mx-auto">
                 <button onClick={() => navigate('/admin-dashboard')} className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 font-medium">
                     <ArrowLeft size={20} /> Back to Dashboard
@@ -165,7 +174,18 @@ const Evaluation = () => {
                     </div>
                 </div>
             </div>
-        </div>
+
+            <ConfirmModal
+                isOpen={confirm.open}
+                title={`Mark as ${confirm.status}`}
+                message={`Are you sure you want to mark this candidate as ${confirm.status}?`}
+                confirmText={confirm.status}
+                type={confirm.status === 'Selected' ? 'info' : 'danger'}
+                onConfirm={doUpdateStatus}
+                onCancel={() => setConfirm({ open: false, id: null, status: '' })}
+            />
+            <Toast isOpen={toast.open} message={toast.message} type={toast.type} onClose={closeToast} />
+        </>
     );
 };
 

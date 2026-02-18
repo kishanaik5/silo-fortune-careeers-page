@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Briefcase, Trash2, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import ConfirmModal from '../components/ConfirmModal';
+import Toast from '../components/Toast';
 
 const ManageJobs = () => {
     const { isAuthenticated, isLoading } = useAuth();
@@ -19,6 +21,11 @@ const ManageJobs = () => {
     });
     const [isEditing, setIsEditing] = useState(false);
     const [editJobId, setEditJobId] = useState(null);
+    const [confirm, setConfirm] = useState({ open: false, id: null });
+    const [toast, setToast] = useState({ open: false, message: '', type: 'success' });
+
+    const showToast = (message, type = 'success') => setToast({ open: true, message, type });
+    const closeToast = () => setToast(t => ({ ...t, open: false }));
 
     useEffect(() => {
         if (!isLoading && !isAuthenticated) {
@@ -65,7 +72,7 @@ const ManageJobs = () => {
                 });
                 setIsEditing(false);
                 setEditJobId(null);
-                alert(isEditing ? "Job updated successfully!" : "Job added successfully!");
+                showToast(isEditing ? 'Job updated successfully!' : 'Job added successfully!', 'success');
             }
         } catch (error) {
             console.error('Error saving job:', error);
@@ -105,20 +112,26 @@ const ManageJobs = () => {
     };
 
     const handleDeleteJob = async (id) => {
-        if (window.confirm("Are you sure you want to delete this job?")) {
-            try {
-                await fetch(`http://localhost:5000/api/jobs/${id}`, { method: 'DELETE' });
-                fetchJobs();
-            } catch (error) {
-                console.error('Error deleting job:', error);
-            }
+        setConfirm({ open: true, id });
+    };
+
+    const doDeleteJob = async () => {
+        const { id } = confirm;
+        setConfirm({ open: false, id: null });
+        try {
+            await fetch(`http://localhost:5000/api/jobs/${id}`, { method: 'DELETE' });
+            fetchJobs();
+            showToast('Job deleted successfully!', 'success');
+        } catch (error) {
+            console.error('Error deleting job:', error);
+            showToast('Error deleting job.', 'error');
         }
     };
 
     if (isLoading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
 
     return (
-        <div className="min-h-screen bg-gray-50 p-8">
+        <>
             <div className="max-w-4xl mx-auto">
                 <button onClick={() => navigate('/admin-dashboard')} className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 font-medium">
                     <ArrowLeft size={20} /> Back to Dashboard
@@ -204,7 +217,18 @@ const ManageJobs = () => {
                     </div>
                 </div>
             </div>
-        </div>
+
+            <ConfirmModal
+                isOpen={confirm.open}
+                title="Delete Job"
+                message="Are you sure you want to delete this job? This action cannot be undone."
+                confirmText="Delete"
+                type="danger"
+                onConfirm={doDeleteJob}
+                onCancel={() => setConfirm({ open: false, id: null })}
+            />
+            <Toast isOpen={toast.open} message={toast.message} type={toast.type} onClose={closeToast} />
+        </>
     );
 };
 

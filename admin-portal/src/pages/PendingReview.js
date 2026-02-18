@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Clock, Mail, Phone, Briefcase, ChevronDown, ChevronUp, FileText, Check, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import Toast from '../components/Toast';
 
 export default function PendingReview() {
     const navigate = useNavigate();
@@ -9,6 +10,10 @@ export default function PendingReview() {
     const [applications, setApplications] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [expandedJob, setExpandedJob] = useState(null);
+    const [toast, setToast] = useState({ open: false, message: '', type: 'success' });
+
+    const showToast = (message, type = 'success') => setToast({ open: true, message, type });
+    const closeToast = () => setToast(t => ({ ...t, open: false }));
 
     useEffect(() => {
         if (!authLoading && !isAuthenticated) {
@@ -33,24 +38,21 @@ export default function PendingReview() {
     };
 
     const handleStatusUpdate = async (id, status) => {
-        if (!window.confirm(`Are you sure you want to ${status.toLowerCase()} this applicant?`)) return;
-
         try {
             const response = await fetch(`http://localhost:5000/api/applications/${id}/status`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status })
             });
-
             if (response.ok) {
-                alert(`Applicant ${status.toLowerCase()} successfully!`);
+                showToast(`Applicant ${status.toLowerCase()} successfully!`, 'success');
                 fetchApplications();
             } else {
-                alert('Failed to update status.');
+                showToast('Failed to update status.', 'error');
             }
         } catch (error) {
             console.error('Error updating status:', error);
-            alert('Error updating status.');
+            showToast('Error updating status.', 'error');
         }
     };
 
@@ -75,7 +77,7 @@ export default function PendingReview() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <>
             {/* Header */}
             <div className="bg-emerald-900 text-white px-6 py-4 flex items-center gap-4 shadow-lg">
                 <button
@@ -196,6 +198,7 @@ export default function PendingReview() {
                     </div>
                 )}
             </div>
-        </div>
+            <Toast isOpen={toast.open} message={toast.message} type={toast.type} onClose={closeToast} />
+        </>
     );
 }

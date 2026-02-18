@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Calendar, MapPin, Ticket, Plus, Trash2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import ConfirmModal from '../components/ConfirmModal';
+import Toast from '../components/Toast';
 
 const ManageEvents = () => {
     const { isAuthenticated, isLoading } = useAuth();
@@ -10,6 +12,11 @@ const ManageEvents = () => {
     const [events, setEvents] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
+    const [confirm, setConfirm] = useState({ open: false, type: '', id: null });
+    const [toast, setToast] = useState({ open: false, message: '', type: 'success' });
+
+    const showToast = (message, type = 'success') => setToast({ open: true, message, type });
+    const closeToast = () => setToast(t => ({ ...t, open: false }));
 
     // Form State
     const [editMode, setEditMode] = useState(false);
@@ -73,15 +80,15 @@ const ManageEvents = () => {
             });
 
             if (response.ok) {
-                alert(`Event ${editMode ? 'updated' : 'created'} successfully!`);
+                showToast(`Event ${editMode ? 'updated' : 'created'} successfully!`, 'success');
                 resetForm();
                 fetchEvents();
             } else {
-                alert(`Failed to ${editMode ? 'update' : 'create'} event.`);
+                showToast(`Failed to ${editMode ? 'update' : 'create'} event.`, 'error');
             }
         } catch (error) {
             console.error(`Error ${editMode ? 'updating' : 'creating'} event:`, error);
-            alert(`Error ${editMode ? 'updating' : 'creating'} event.`);
+            showToast(`Error ${editMode ? 'updating' : 'creating'} event.`, 'error');
         }
     };
 
@@ -99,49 +106,53 @@ const ManageEvents = () => {
         setShowForm(true);
     };
 
-    const handleDeleteClick = async (id) => {
-        if (window.confirm('Are you sure you want to delete this event? This action cannot be undone.')) {
-            try {
-                const response = await fetch(`http://localhost:5000/api/events/${id}`, {
-                    method: 'DELETE',
-                });
+    const handleDeleteClick = (id) => {
+        setConfirm({ open: true, type: 'delete', id });
+    };
 
-                if (response.ok) {
-                    alert('Event deleted successfully!');
-                    fetchEvents();
-                } else {
-                    alert('Failed to delete event.');
-                }
-            } catch (error) {
-                console.error('Error deleting event:', error);
+    const doDeleteEvent = async () => {
+        const { id } = confirm;
+        setConfirm({ open: false, type: '', id: null });
+        try {
+            const response = await fetch(`http://localhost:5000/api/events/${id}`, { method: 'DELETE' });
+            if (response.ok) {
+                showToast('Event deleted successfully!', 'success');
+                fetchEvents();
+            } else {
+                showToast('Failed to delete event.', 'error');
             }
+        } catch (error) {
+            console.error('Error deleting event:', error);
         }
     };
 
-    const handleMarkDone = async (id) => {
-        if (window.confirm('Mark this event as done?')) {
-            try {
-                const response = await fetch(`http://localhost:5000/api/events/${id}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ status: 'Done' })
-                });
+    const handleMarkDone = (id) => {
+        setConfirm({ open: true, type: 'done', id });
+    };
 
-                if (response.ok) {
-                    fetchEvents();
-                } else {
-                    alert('Failed to update status.');
-                }
-            } catch (error) {
-                console.error('Error updating status:', error);
+    const doMarkDone = async () => {
+        const { id } = confirm;
+        setConfirm({ open: false, type: '', id: null });
+        try {
+            const response = await fetch(`http://localhost:5000/api/events/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: 'Done' })
+            });
+            if (response.ok) {
+                fetchEvents();
+            } else {
+                showToast('Failed to update status.', 'error');
             }
+        } catch (error) {
+            console.error('Error updating status:', error);
         }
     };
 
     if (loading) return <div className="min-h-screen flex items-center justify-center">Loading events...</div>;
 
     return (
-        <div className="min-h-screen bg-gray-50 p-8 font-sans">
+        <>
             <div className="max-w-6xl mx-auto">
                 <button onClick={() => navigate('/admin-dashboard')} className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 font-medium">
                     <ArrowLeft size={20} /> Back to Dashboard
@@ -276,7 +287,20 @@ const ManageEvents = () => {
                     ))}
                 </div>
             </div>
-        </div>
+
+            <ConfirmModal
+                isOpen={confirm.open}
+                title={confirm.type === 'delete' ? 'Delete Event' : 'Mark as Done'}
+                message={confirm.type === 'delete'
+                    ? 'Are you sure you want to delete this event? This action cannot be undone.'
+                    : 'Mark this event as done? This cannot be reversed.'}
+                confirmText={confirm.type === 'delete' ? 'Delete' : 'Mark Done'}
+                type={confirm.type === 'delete' ? 'danger' : 'warning'}
+                onConfirm={confirm.type === 'delete' ? doDeleteEvent : doMarkDone}
+                onCancel={() => setConfirm({ open: false, type: '', id: null })}
+            />
+            <Toast isOpen={toast.open} message={toast.message} type={toast.type} onClose={closeToast} />
+        </>
     );
 };
 

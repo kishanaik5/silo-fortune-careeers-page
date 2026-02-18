@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Mail, Phone, Send, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import Toast from '../components/Toast';
 
 const SelectedCandidates = () => {
     const { isAuthenticated, isLoading } = useAuth();
@@ -13,6 +14,10 @@ const SelectedCandidates = () => {
     const [selectedApplicant, setSelectedApplicant] = useState(null);
     const [emailSubject, setEmailSubject] = useState('');
     const [emailBody, setEmailBody] = useState('');
+    const [toast, setToast] = useState({ open: false, message: '', type: 'success' });
+
+    const showToast = (message, type = 'success') => setToast({ open: true, message, type });
+    const closeToast = () => setToast(t => ({ ...t, open: false }));
 
     useEffect(() => {
         if (!isLoading && !isAuthenticated) {
@@ -58,21 +63,21 @@ const SelectedCandidates = () => {
             if (response.ok) {
                 setShowEmailModal(false);
                 setSelectedApplicant(null);
-                alert('Offer email sent successfully!');
+                showToast('Offer email sent successfully!', 'success');
             } else {
                 const errorData = await response.json();
-                alert(`Failed to send email: ${errorData.error || 'Unknown error'}`);
+                showToast(`Failed to send email: ${errorData.error || 'Unknown error'}`, 'error');
             }
         } catch (error) {
             console.error('Error sending email:', error);
-            alert(`Error sending email: ${error.message}`);
+            showToast(`Error sending email: ${error.message}`, 'error');
         }
     };
 
     if (isLoading) return <div>Loading...</div>;
 
     return (
-        <div className="min-h-screen bg-gray-50 p-8 relative">
+        <>
             <div className="max-w-6xl mx-auto">
                 <button onClick={() => navigate('/admin-dashboard')} className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 font-medium">
                     <ArrowLeft size={20} /> Back to Dashboard
@@ -177,7 +182,8 @@ const SelectedCandidates = () => {
                     </div>
                 </div>
             )}
-        </div>
+            <Toast isOpen={toast.open} message={toast.message} type={toast.type} onClose={closeToast} />
+        </>
     );
 };
 
