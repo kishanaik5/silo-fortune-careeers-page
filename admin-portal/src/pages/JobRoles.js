@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, Download, Users, Check, X, FileText } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const JobRoles = () => {
     const { isAuthenticated, isLoading } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
     const [applications, setApplications] = useState([]);
     const [roles, setRoles] = useState([]);
     const [selectedRole, setSelectedRole] = useState(null);
@@ -16,6 +17,13 @@ const JobRoles = () => {
         }
         fetchApplications();
     }, [isAuthenticated, isLoading, navigate]);
+
+    // Auto-select role if navigated from PendingReview
+    useEffect(() => {
+        if (location.state?.role) {
+            setSelectedRole(location.state.role);
+        }
+    }, [location.state]);
 
     const fetchApplications = async () => {
         try {
@@ -192,8 +200,8 @@ const JobRoles = () => {
                                             </td>
                                             <td className="py-3 px-4">
                                                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${app.status === 'Shortlisted' ? 'bg-green-100 text-green-700' :
-                                                        app.status === 'Rejected' ? 'bg-red-100 text-red-700' :
-                                                            'bg-yellow-100 text-yellow-700'
+                                                    app.status === 'Rejected' ? 'bg-red-100 text-red-700' :
+                                                        'bg-yellow-100 text-yellow-700'
                                                     }`}>
                                                     {app.status}
                                                 </span>

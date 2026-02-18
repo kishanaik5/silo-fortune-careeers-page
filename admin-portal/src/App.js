@@ -11,6 +11,8 @@ import SelectedCandidates from './pages/SelectedCandidates';
 import EventRegistrations from './pages/EventRegistrations';
 
 import ManageEvents from './pages/ManageEvents';
+import PendingReview from './pages/PendingReview';
+import ShortlistedReview from './pages/ShortlistedReview';
 
 function App() {
   return (
@@ -27,6 +29,8 @@ function App() {
           <Route path="/admin-evaluation" element={<Evaluation />} />
           <Route path="/admin-selected-candidates" element={<SelectedCandidates />} />
           <Route path="/admin-event-registrations" element={<EventRegistrations />} />
+          <Route path="/admin-pending-review" element={<PendingReview />} />
+          <Route path="/admin-shortlisted-review" element={<ShortlistedReview />} />
         </Routes>
       </AuthProvider>
     </Router>

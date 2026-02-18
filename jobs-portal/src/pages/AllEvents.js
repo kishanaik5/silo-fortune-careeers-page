@@ -61,6 +61,18 @@ const AllEvents = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!formData.email.endsWith('@gmail.com')) {
+            alert('Only @gmail.com email addresses are allowed.');
+            return;
+        }
+
+        const phoneDigits = formData.phone.replace(/\D/g, '');
+        if (phoneDigits.length !== 10) {
+            alert('Phone number must be exactly 10 digits.');
+            return;
+        }
+
         setLoading(true);
 
         try {
@@ -162,7 +174,8 @@ const AllEvents = () => {
 
                         <div className="p-8">
                             <h2 className="text-2xl font-bold text-gray-900 mb-2">Register for Event</h2>
-                            <p className="text-emerald-700 font-medium mb-6">{selectedEvent?.title}</p>
+                            <p className="text-emerald-700 font-medium mb-1">{selectedEvent?.title}</p>
+                            <p className="text-gray-500 text-sm mb-6">Price per ticket: <span className="font-bold text-gray-800">₹{selectedEvent?.price > 0 ? selectedEvent.price : 'Free'}</span></p>
 
                             {success ? (
                                 <div className="text-center py-8">
@@ -180,11 +193,12 @@ const AllEvents = () => {
                                     </div>
                                     <div>
                                         <label className="block text-sm font-semibold text-gray-700 mb-1">Email Address</label>
-                                        <input required name="email" value={formData.email} onChange={handleChange} type="email" className="w-full p-3 border rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="john@example.com" />
+                                        <input required name="email" value={formData.email} onChange={handleChange} type="email" className="w-full p-3 border rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="john@gmail.com" />
+                                        <p className="text-xs text-gray-400 mt-1">Only @gmail.com allowed</p>
                                     </div>
                                     <div>
                                         <label className="block text-sm font-semibold text-gray-700 mb-1">Phone Number</label>
-                                        <input required name="phone" value={formData.phone} onChange={handleChange} type="tel" className="w-full p-3 border rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="+91 98765 43210" />
+                                        <input required name="phone" value={formData.phone} onChange={(e) => { const val = e.target.value.replace(/\D/g, ''); if (val.length <= 10) setFormData({ ...formData, phone: val }); }} type="tel" maxLength={10} className="w-full p-3 border rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="10-digit phone number" />
                                     </div>
                                     <div>
                                         <label className="block text-sm font-semibold text-gray-700 mb-1">Number of Tickets</label>

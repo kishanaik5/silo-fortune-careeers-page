@@ -52,7 +52,8 @@ const AdminDashboard = () => {
             color: "amber",
             bg: "bg-amber-50",
             text: "text-amber-600",
-            border: "border-amber-200"
+            border: "border-amber-200",
+            link: "/admin-pending-review"
         },
         {
             label: "Shortlisted",
@@ -61,7 +62,8 @@ const AdminDashboard = () => {
             color: "emerald",
             bg: "bg-emerald-50",
             text: "text-emerald-600",
-            border: "border-emerald-200"
+            border: "border-emerald-200",
+            link: "/admin-shortlisted-review"
         },
         {
             label: "Rejected",

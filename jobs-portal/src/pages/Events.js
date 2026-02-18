@@ -120,6 +120,12 @@ const Events = () => {
             return;
         }
 
+        const phoneDigits = formData.phone.replace(/\D/g, '');
+        if (phoneDigits.length !== 10) {
+            alert('Phone number must be exactly 10 digits.');
+            return;
+        }
+
         setLoading(true);
 
         try {
@@ -311,7 +317,7 @@ const Events = () => {
                                     </div>
                                     <div>
                                         <label className="block text-sm font-semibold text-gray-700 mb-1">Phone Number</label>
-                                        <input required name="phone" value={formData.phone} onChange={handleChange} type="tel" className="w-full p-3 border rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="+91 98765 43210" />
+                                        <input required name="phone" value={formData.phone} onChange={(e) => { const val = e.target.value.replace(/\D/g, ''); if (val.length <= 10) setFormData({ ...formData, phone: val }); }} type="tel" maxLength={10} className="w-full p-3 border rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="10-digit phone number" />
                                     </div>
                                     <div>
                                         <label className="block text-sm font-semibold text-gray-700 mb-1">Number of Tickets</label>
